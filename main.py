@@ -1,6 +1,7 @@
 
 import re
 import urllib.request
+import tiktoken
 
 
 class SimpleTokenizerV2:
@@ -45,11 +46,15 @@ def main():
     all_words.extend(["<|endoftext|>", "<|unk|>"])
     vocab = create_vocab(all_words)
 
-    tokenizer = SimpleTokenizerV2(vocab)
+    tokenizer = tiktoken.get_encoding("gpt2")
     text1 = "Hello, do you like tea?"
     text2 = "In the sunlit terraces of the palace."
     text = " <|endoftext|> ".join((text1, text2))
-    ids = tokenizer.encode(text)
+    ids = tokenizer.encode(text, allowed_special={"<|endoftext|>"})
+    print(ids)
+    print(tokenizer.decode(ids))
+
+    ids = tokenizer.encode("Akwirw ier", allowed_special={"<|endoftext|>"})
     print(ids)
     print(tokenizer.decode(ids))
 
