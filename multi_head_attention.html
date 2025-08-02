@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多头注意力完整流程可视化</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem;
+        }
+        .step-card {
+            background-color: #1F2937;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+        .matrix-representation {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .tensor-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .matrix {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+            border: 1px solid #4B5563;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            min-width: 5rem;
+        }
+        .matrix-row {
+            display: flex;
+            gap: 0.125rem;
+        }
+        .cell {
+            width: 1rem;
+            height: 1rem;
+            background-color: #6B7280;
+            border-radius: 0.125rem;
+        }
+        .query-cell {
+            background-color: #FBBF24; /* Amber */
+        }
+        .key-cell {
+            background-color: #34D399; /* Emerald */
+        }
+        .value-cell {
+            background-color: #6366F1; /* Indigo */
+        }
+        .score-cell {
+            background-color: #9CA3AF; /* Gray */
+        }
+        .label {
+            font-weight: 600;
+            color: #D1D5DB;
+        }
+        .dim-text {
+            font-size: 0.875rem;
+            color: #9CA3AF;
+        }
+        .op-symbol {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #9CA3AF;
+        }
+        .arrow {
+            color: #9CA3AF;
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 p-8 flex flex-col items-center">
+
+    <div class="max-w-6xl w-full">
+        <h1 class="text-3xl font-bold text-center text-teal-300 mb-6">多头注意力完整流程可视化</h1>
+        <p class="text-center text-gray-400 mb-8">此流程图展示了高效多头注意力机制中张量形状的变化和计算过程。</p>
+
+        <div class="flow-container">
+
+            <!-- Step 1: Inputs -->
+            <div class="step-card w-full">
+                <h2 class="text-xl font-semibold mb-4 text-teal-300">1. 输入张量</h2>
+                <div class="matrix-representation">
+                    <div class="tensor-box">
+                        <div class="label">输入 (x)</div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                            <div class="matrix-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                            <div class="matrix-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                            <div class="matrix-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                            <div class="matrix-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                            <div class="matrix-row"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 6, 3]</div>
+                    </div>
+                </div>
+            </div>
+
+            <i class="fas fa-arrow-down arrow"></i>
+
+            <!-- Step 2: Linear Projection -->
+            <div class="step-card w-full">
+                <h2 class="text-xl font-semibold mb-4 text-teal-300">2. 线性投影 (W_Q, W_K, W_V)</h2>
+                <div class="matrix-representation">
+                    <div class="tensor-box">
+                        <div class="label text-amber-300">Queries (Q)</div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 6, 2]</div>
+                    </div>
+                    <div class="tensor-box">
+                        <div class="label text-emerald-300">Keys (K)</div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 6, 2]</div>
+                    </div>
+                    <div class="tensor-box">
+                        <div class="label text-indigo-300">Values (V)</div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 6, 2]</div>
+                    </div>
+                </div>
+            </div>
+
+            <i class="fas fa-arrow-down arrow"></i>
+
+            <!-- Step 3: Reshaping and Transposing -->
+            <div class="step-card w-full">
+                <h2 class="text-xl font-semibold mb-4 text-teal-300">3. 形状重塑与转置</h2>
+                <div class="matrix-representation">
+                    <div class="tensor-box">
+                        <div class="label text-amber-300">Queries (Q)</div>
+                        <div class="dim-text"><code>.view(b, num_tokens, num_heads, head_dim)</code></div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 6, 2, 1]</div>
+                    </div>
+                    <div class="tensor-box">
+                        <div class="label text-emerald-300">Keys (K)</div>
+                        <div class="dim-text"><code>.view(b, num_tokens, num_heads, head_dim)</code></div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 6, 2, 1]</div>
+                    </div>
+                    <div class="tensor-box">
+                        <div class="label text-indigo-300">Values (V)</div>
+                        <div class="dim-text"><code>.view(b, num_tokens, num_heads, head_dim)</code></div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 6, 2, 1]</div>
+                    </div>
+                </div>
+            </div>
+
+            <i class="fas fa-arrow-down arrow"></i>
+
+            <!-- Step 4: Transposition -->
+            <div class="step-card w-full">
+                <h2 class="text-xl font-semibold mb-4 text-teal-300">4. 转置：为并行计算做准备</h2>
+                <div class="matrix-representation">
+                    <div class="tensor-box">
+                        <div class="label text-amber-300">Queries (Q)</div>
+                        <div class="dim-text"><code>.transpose(1, 2)</code></div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                            <div class="matrix-row"><div class="cell query-cell"></div><div class="cell query-cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 2, 6, 1]</div>
+                    </div>
+                    <div class="op-symbol">-></div>
+                    <div class="tensor-box">
+                        <div class="label text-emerald-300">Keys (K)</div>
+                        <div class="dim-text"><code>.transpose(1, 2)</code></div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                            <div class="matrix-row"><div class="cell key-cell"></div><div class="cell key-cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 2, 6, 1]</div>
+                    </div>
+                </div>
+            </div>
+
+            <i class="fas fa-arrow-down arrow"></i>
+
+            <!-- Step 5: Attention Scores Calculation -->
+            <div class="step-card w-full">
+                <h2 class="text-xl font-semibold mb-4 text-teal-300">5. 计算注意力分数</h2>
+                <p class="text-gray-400 mb-4">通过批次矩阵乘法，并行计算所有头的注意力分数。</p>
+                <div class="matrix-representation">
+                    <div class="tensor-box">
+                        <div class="label text-amber-300">Queries (Q)</div>
+                        <div class="dim-text">[2, 2, 6, 1]</div>
+                    </div>
+                    <div class="op-symbol">@</div>
+                    <div class="tensor-box">
+                        <div class="label text-emerald-300">Keys.T (K^T)</div>
+                        <div class="dim-text">[2, 2, 1, 6]</div>
+                    </div>
+                    <div class="op-symbol">=</div>
+                    <div class="tensor-box">
+                        <div class="label text-white">Scores</div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div></div>
+                            <div class="matrix-row"><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div></div>
+                            <div class="matrix-row"><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div></div>
+                            <div class="matrix-row"><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div></div>
+                            <div class="matrix-row"><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div></div>
+                            <div class="matrix-row"><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div><div class="cell score-cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 2, 6, 6]</div>
+                    </div>
+                </div>
+            </div>
+            
+            <i class="fas fa-arrow-down arrow"></i>
+
+            <!-- Step 6: Final Output -->
+            <div class="step-card w-full">
+                <h2 class="text-xl font-semibold mb-4 text-teal-300">6. 计算上下文向量与最终投影</h2>
+                <div class="matrix-representation">
+                    <div class="tensor-box">
+                        <div class="label text-indigo-300">Context Vector</div>
+                        <div class="matrix">
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                            <div class="matrix-row"><div class="cell value-cell"></div><div class="cell value-cell"></div></div>
+                        </div>
+                        <div class="dim-text">形状: [2, 6, 2]</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
