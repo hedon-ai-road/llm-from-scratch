@@ -12,3 +12,6 @@ wheels/
 # traning data
 gpt2
 **.pth
+**.zip
+**.csv
+sms_spam_collection/
