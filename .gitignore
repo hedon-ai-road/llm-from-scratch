@@ -15,3 +15,5 @@ gpt2
 **.zip
 **.csv
 sms_spam_collection/
+instruction-data.json
+instruction-data-with-response.json
