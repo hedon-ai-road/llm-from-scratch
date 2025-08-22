@@ -1,6 +1,7 @@
 import urllib.request
 import zipfile
 import os
+import pandas as pd
 
 from pathlib import Path
 
@@ -11,6 +12,7 @@ data_file_path = Path(extracted_path) / "SMSSpamCollection.tsv"
 
 def download_and_unzip_spam_data(
     url, zip_path, extracted_path, data_file_path: Path):
+    """下载数据集"""
     if data_file_path.exists():
         print(f"{data_file_path} already exists. Skipping download and extraction.")
         return
@@ -26,4 +28,32 @@ def download_and_unzip_spam_data(
     os.rename(original_file_path, data_file_path)
     print(f"File downloaded and save as {data_file_path}")
 
-download_and_unzip_spam_data(url, zip_path, extracted_path, data_file_path)
+def create_balanced_dataset(df):
+    """创建平衡数据集"""
+    num_spam = df[df["Label"] == "spam"].shape[0]
+    ham_subset = df[df["Label"] == "ham"].sample(
+        num_spam, random_state=123,
+    )
+    balanced_df = pd.concat([
+        ham_subset, df[df["Label"] == "spam"]
+    ])
+    return balanced_df
+
+
+def random_split(df, train_frac, validation_frac):
+    """划分数据集"""
+    df = df.sample(
+        frac=1, random_state=123
+    ).reset_index(drop=True)
+    train_end = int(len(df) * train_frac)
+    validation_end = train_end + int(len(df) * validation_frac)
+
+    train_df = df[:train_end]
+    validation_df = df[train_end:validation_end]
+    test_df = df[validation_end:]
+
+    return train_df, validation_df, test_df
+
+
+if __name__ == "__main__":
+    download_and_unzip_spam_data(url, zip_path, extracted_path, data_file_path)

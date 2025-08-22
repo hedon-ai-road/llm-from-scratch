@@ -18,6 +18,7 @@ url = (
     "/main/ch07/01_main-chapter-code/instruction-data.json"
 )
 
-data = download_and_load_file(file_path, url)
-print("Number of entries:", len(data))
-print("Example entry: \n", data[50])
+if __name__ == "__main__":
+    data = download_and_load_file(file_path, url)
+    print("Number of entries:", len(data))
+    print("Example entry: \n", data[50])
